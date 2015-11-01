@@ -40,8 +40,8 @@ public class CannonBall {
         yPos = yBottom;
 
         //Calculates velocity vectors
-        xVel = (int) (power*Math.sin(Math.toRadians(deg)));
-        yVel = (int) -(power*Math.cos(Math.toRadians(deg)));
+        xVel = power*Math.sin(Math.toRadians(deg));
+        yVel = -power*Math.cos(Math.toRadians(deg));
 
         //Inits paint
         blackPaint = new Paint();
