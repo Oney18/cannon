@@ -13,6 +13,7 @@ import java.util.ArrayList;
  *
  * TO GRADER: EC Options Included:
  *      Targets have animated explosion upon hit (5pt)
+ *      Targets Move (5pt)
  *      Arbitrary number of cannonballs on screen at once (5pt)
  *      Balls bounce realistically on the ground (5pt)
  * 
