@@ -12,16 +12,17 @@ import android.graphics.Paint;
 public class Target {
 
     private Paint redPaint;
-    private Paint whitePaint;
+    private Paint whitePaint; //paints used for the targets
     private Paint blackPaint;
-    private int initX;
-    private int initY;
-    private int xCent;
-    private int yCent;
-    private int type;
+
+    private int initX; //starting x pos
+    private int initY; //starting y pos
+    private int xCent; //x pos of target
+    private int yCent; //y pos of target
+    private int type; //the kind/phase of the target
     private int hitCount; //count when hit
-    private int velX;
-    private int velY;
+    private int velX; //speed of movement in X
+    private int velY; //speed of movement in Y
 
     public Target(int initX, int initY, int type)
     {
@@ -51,7 +52,7 @@ public class Target {
 
         switch (type) {
 
-            case 1:
+            case 1: //target goes to left and right
                 xCent = initX + velX;
                 yCent = initY;
                 g.drawCircle(xCent, yCent, 70, redPaint);
@@ -60,7 +61,7 @@ public class Target {
                 g.drawCircle(xCent, yCent, 10, whitePaint);
                 break;
 
-            case 2:
+            case 2: //target goes up and down
                 xCent = initX;
                 yCent = initY + velY;
                 g.drawCircle(xCent, yCent, 70, redPaint);
@@ -69,29 +70,42 @@ public class Target {
                 g.drawCircle(xCent, yCent, 10, whitePaint);
                 break;
 
-            case 3:
-                g.drawCircle(xCent, yCent, 70, redPaint);
-                g.drawCircle(xCent, yCent, 50, whitePaint);
-                g.drawCircle(xCent, yCent, 30, redPaint);
-                g.drawCircle(xCent, yCent, 10, whitePaint);
-                g.drawCircle(xCent, yCent, hitCount, blackPaint);
+            case 3: //explosion growing
+                g.drawCircle(xCent, yCent + 2*hitCount, 70, redPaint);
+                g.drawCircle(xCent, yCent + 2*hitCount, 50, whitePaint);
+                g.drawCircle(xCent, yCent + 2*hitCount, 30, redPaint);
+                g.drawCircle(xCent, yCent + 2*hitCount, 10, whitePaint);
+                g.drawCircle(xCent, yCent + 2*hitCount, hitCount, blackPaint);
+                blackPaint.setAlpha((int)(2.5*hitCount)); //gets darker
                 hitCount++;
-                if (hitCount == 101) {
+
+                if (hitCount >= 101) { //begins second phase of explosion
+                    yCent += 2*hitCount;
                     type = 4;
                 }
                 break;
 
-            case 4:
-                //this is gone
+            case 4: //explosion leaving
+                g.drawCircle(xCent, yCent + 2*(101 - hitCount), hitCount, blackPaint);
+                blackPaint.setAlpha((int)(2.5*hitCount)); //gets lighter
+                hitCount--;
+                if(hitCount <= 1) //explosion concluded
+                {
+                    type = 5;
+                }
+                break;
+
+            case 5: //blank space
+                break; //this target is destroyed
         }
     }
 
 
 
-    public void isHit(CannonBall ball)
+    public void checkHit(CannonBall ball)
     {
-        if(ball.getxPos() - xCent <= 30 && ball.getxPos() - xCent >= 30 &&
-                ball.getyPos() - yCent <= 30 && ball.getyPos() - yCent >= 30)
+        if( type < 3 && ball.getxPos() - xCent <= 50 && ball.getxPos() - xCent >= -50 &&
+                ball.getyPos() - yCent <= 50 && ball.getyPos() - yCent >= -50)
         {
           type = 3;
         }

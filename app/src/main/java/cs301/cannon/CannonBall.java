@@ -15,6 +15,8 @@ public class CannonBall {
     private int bottomOfScreen;
     private Paint blackPaint;
     private int life;
+
+    private static int wind = 0;
     private static int rad = 40;
     private static int power = 75;
 
@@ -47,6 +49,8 @@ public class CannonBall {
             yPos = bottomOfScreen;
         }
 
+        xVel += wind;
+
         life++;
     }
 
@@ -58,5 +62,10 @@ public class CannonBall {
     public int getyPos()
     {
         return yPos;
+    }
+
+    public void setWind(int wind)
+    {
+        this.wind = wind;
     }
 }
