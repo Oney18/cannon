@@ -3,6 +3,8 @@ package cs301.cannon;
 import android.graphics.*;
 import android.view.MotionEvent;
 
+import java.util.ArrayList;
+
 
 /**
  * class that animates a ball repeatedly moving diagonally on
@@ -15,8 +17,19 @@ import android.view.MotionEvent;
 public class TestAnimator implements Animator {
 
 	// instance variables
-	private int count = 0; // counts the number of logical clock ticks
+	private double count = 0; // counts the number of logical clock ticks
 	private boolean goBackwards = false; // whether clock is ticking backwards
+
+	private int fireX; //coords for the fire button
+	private int fireY;
+	private int xSize;
+	private int ySize;
+	private int shots = 0;
+
+	private Target topTarg;
+	private Target sideTarg;
+	private Cannon cannon;
+	private ArrayList<CannonBall> balls;
 	
 	/**
 	 * Interval between animation frames: .03 seconds (i.e., about 33 times
@@ -56,25 +69,63 @@ public class TestAnimator implements Animator {
 	public void tick(Canvas g) {
 		// bump our count either up or down by one, depending on whether
 		// we are in "backwards mode".
-		if (goBackwards) {
-			count--;
-		}
-		else {
-			count++;
-		}
-		
-		// Determine the pixel position of our ball.  Multiplying by 15
-		// has the effect of moving 15 pixel per frame.  Modding by 600
-		// (with the appropriate correction if the value was negative)
-		// has the effect of "wrapping around" when we get to either end
-		// (since our canvas size is 600 in each dimension).
-		int num = (count*15)%600;
-		if (num < 0) num += 600;
-		
-		// Draw the ball in the correct position.
+
+		count++; //used for targets' pos
+
+		//used for fire button
 		Paint redPaint = new Paint();
 		redPaint.setColor(Color.RED);
-		g.drawCircle(num, num, 60, redPaint);
+
+		//used for magnitude display
+		if(balls != null) {
+			Paint textPaint = new Paint();
+			textPaint.setColor(Color.BLACK);
+			textPaint.setTextSize(45);
+			String pow = "Shots: " + shots;
+			g.drawText(pow, xSize - 300, 100, textPaint);
+		}
+
+		//used throughout class
+		xSize = g.getWidth();
+		ySize = g.getHeight();
+
+
+		//draw fire button
+		g.drawOval(xSize - 200, ySize - 200, xSize, ySize, redPaint);
+
+		//used to determine if the button is pressed
+		this.fireX = xSize - 300;
+		this.fireY = ySize - 300;
+
+		//set targs
+		if(topTarg == null) { //everything set at once so if oen is null, all are null
+			topTarg = new Target(xSize - xSize / 2, 100, 1);
+			sideTarg = new Target(xSize - 300, ySize - ySize / 2, 2);
+			cannon = new Cannon(ySize);
+			balls = new ArrayList<CannonBall>();
+		}
+
+		topTarg.draw(g, count);
+		sideTarg.draw(g, count);
+
+		for(int i = 0; i < balls.size(); i++)
+		{
+			if(balls.get(i).getxPos() > xSize)
+			{
+				balls.remove(i);
+				i--;
+			}
+
+			if(i < balls.size() && i >= 0) {
+				balls.get(i).draw(g);
+			}
+
+		}
+
+		cannon.draw(g);
+
+
+
 	}
 
 	/**
@@ -100,9 +151,18 @@ public class TestAnimator implements Animator {
 	 */
 	public void onTouch(MotionEvent event)
 	{
-		if (event.getAction() == MotionEvent.ACTION_DOWN)
+		if(event.getX() >= fireX && event.getY() >= fireY )
 		{
-			goBackwards = !goBackwards;
+			if(event.getAction() == MotionEvent.ACTION_DOWN) {
+				CannonBall ball = new CannonBall(cannon.getDegrees(), ySize);
+				balls.add(ball);
+				shots++;
+			}
+		}
+		else
+		{
+			int deg = (int) Math.toDegrees(Math.atan(((double) (ySize - event.getY())) / event.getX()));
+			cannon.setDegrees(90 - deg);
 		}
 	}
 	
