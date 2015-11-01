@@ -67,14 +67,6 @@ public class CannonBall {
         xPos += xVel;
         yPos += yVel;
 
-
-        //Bounces if hits the bottom of the screen
-        if(yPos >= bottomOfScreen - rad && life != 0)
-        {
-            yVel *= -0.7;
-            yPos = bottomOfScreen - rad;
-        }
-
         //Gravity effects
         yVel += 2;
 
