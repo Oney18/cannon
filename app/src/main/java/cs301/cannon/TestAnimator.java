@@ -80,26 +80,47 @@ public class TestAnimator implements Animator {
         bluePaint.setAlpha(150);
         greyPaint.setColor(Color.GRAY);
 
-
-		//used for magnitude display
-		if(balls != null) {
-			Paint textPaint = new Paint();
-			textPaint.setColor(Color.BLACK);
-			textPaint.setTextSize(45);
-			String pow = "Shots: " + shots;
-			g.drawText(pow, xSize - 300, 100, textPaint);
-		}
-
-		//used throughout class
-		xSize = g.getWidth();
-		ySize = g.getHeight();
+        //used throughout class
+        xSize = g.getWidth();
+        ySize = g.getHeight();
         xBarL = xSize/2 - 500;
         xBarR = xSize/2 + 500;
+
+        //set targs
+        if(topTarg == null) { //everything set at once so if one is null, all are null
+            topTarg = new Target(xSize - xSize / 2, 100, 1);
+            sideTarg = new Target(xSize - 300, ySize - ySize / 2, 2);
+            cannon = new Cannon(ySize);
+            balls = new ArrayList<CannonBall>();
+            masterBall = new CannonBall(0,0); //used to change wind universally
+        }
+
+        //used for text display display
+        Paint textPaint = new Paint();
+        textPaint.setColor(Color.BLACK);
+        textPaint.setTextSize(45);
+
+        g.drawText("Shots: " + shots, xSize - 325, 100, textPaint);
+
+        //displays which targets are hit
+        g.drawText("Hit:", xSize - 275, 170, textPaint);
+
+        if(topTarg.isHit())
+        {
+            g.drawText("Top Target", xSize - 345, 310, textPaint);
+        }
+
+        if(sideTarg.isHit())
+        {
+            g.drawText("Side Target", xSize - 350, 240, textPaint);
+        }
+
+
 
 
 
 		//draw fire button
-		g.drawOval(xSize - 200, ySize - 200, xSize, ySize, redPaint);
+		g.drawOval(xSize - 205, ySize - 205, xSize - 5, ySize - 5, redPaint);
 
         //draw wind bar
         g.drawRect(xBarL, ySize - 150, xBarR, ySize - 50, greyPaint);
@@ -109,21 +130,12 @@ public class TestAnimator implements Animator {
 		this.fireX = xSize - 300;
 		this.fireY = ySize - 300;
 
-		//set targs
-		if(topTarg == null) { //everything set at once so if oen is null, all are null
-			topTarg = new Target(xSize - xSize / 2, 100, 1);
-			sideTarg = new Target(xSize - 300, ySize - ySize / 2, 2);
-			cannon = new Cannon(ySize);
-			balls = new ArrayList<CannonBall>();
-            masterBall = new CannonBall(0,0); //used to change wind universally
-		}
-
         topTarg.draw(g, count);
         sideTarg.draw(g, count);
 
 		for(int i = 0; i < balls.size(); i++)
 		{
-			if(balls.get(i).getxPos() > xSize)
+			if(balls.get(i).getxPos() > xSize || balls.get(i).getxPos() < 0)
 			{
 				balls.remove(i);
 				i--;
@@ -133,8 +145,8 @@ public class TestAnimator implements Animator {
 				balls.get(i).draw(g);
                 topTarg.checkHit(balls.get(i));
                 sideTarg.checkHit(balls.get(i));
+                cannon.checkHit(balls.get(i));
 			}
-
 		}
 
 		cannon.draw(g);
@@ -160,36 +172,36 @@ public class TestAnimator implements Animator {
 	}
 	
 	/**
-	 * reverse the ball's direction when the screen is tapped
+	 * Controls the app depending on where the user clicks
 	 */
 	public void onTouch(MotionEvent event)
 	{
-		if(event.getX() >= fireX && event.getY() >= fireY )
+		if(event.getX() >= fireX && event.getY() >= fireY && !cannon.isDestroyed()) //fire button, cannon exists
 		{
-			if(event.getAction() == MotionEvent.ACTION_DOWN) {
+			if(event.getAction() == MotionEvent.ACTION_DOWN) { //prevents moving cannon when shooting
 				CannonBall ball = new CannonBall(cannon.getDegrees(), ySize);
 				balls.add(ball);
 				shots++;
 			}
 		}
-        else if(event.getX() >= xBarL && event.getX() <= xBarR && event.getY() >= ySize - 150)
+        else if(event.getX() >= xBarL && event.getX() <= xBarR && event.getY() >= ySize - 150) //change wind
         {
             wind = (int) (((double) (event.getX() - xSize/2)/500)*3);
 
-            if(event.getX() <= xSize/2)
+            if(event.getX() <= xSize/2) //left side hit
             {
                 windRectFillL = (int) event.getX();
                 windRectFillR = xSize/2;
             }
-            else
+            else //right side hit
             {
                 windRectFillL = xSize/2;
                 windRectFillR = (int) event.getX();
             }
 
-            masterBall.setWind(wind);
+            masterBall.setWind(wind); //wind set for all balls
         }
-		else
+		else //change angle if cannon not destoryed
 		{
 			int deg = (int) Math.toDegrees(Math.atan(((double) (ySize - event.getY())) / event.getX()));
 			cannon.setDegrees(90 - deg);

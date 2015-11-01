@@ -24,6 +24,8 @@ public class Target {
     private int velX; //speed of movement in X
     private int velY; //speed of movement in Y
 
+    private boolean hit;
+
     public Target(int initX, int initY, int type)
     {
         redPaint = new Paint();
@@ -39,6 +41,7 @@ public class Target {
         this.initY = initY;
 
         this.type = type;
+        hit = false;
     }
 
     public void draw(Canvas g, double count) {
@@ -100,7 +103,10 @@ public class Target {
         }
     }
 
-
+    public boolean isHit()
+    {
+        return hit;
+    }
 
     public void checkHit(CannonBall ball)
     {
@@ -108,6 +114,7 @@ public class Target {
                 ball.getyPos() - yCent <= 50 && ball.getyPos() - yCent >= -50)
         {
           type = 3;
+            hit = true;
         }
     }
 }

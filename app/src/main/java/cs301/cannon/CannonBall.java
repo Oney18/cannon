@@ -68,4 +68,9 @@ public class CannonBall {
     {
         this.wind = wind;
     }
+
+    public int getLife()
+    {
+        return life;
+    }
 }
