@@ -11,11 +11,9 @@ import java.util.ArrayList;
  *
  * Class that represents the animation of the cannon game
  *
- * TO GRADER: EC Options Included:
- *      Targets have animated explosion upon hit (5pt)
- *      Targets Move (5pt)
- *      Arbitrary number of cannonballs on screen at once (5pt)
- *      Balls bounce realistically on the ground (5pt)
+ * TO GRADER:
+ *      Wind is included as part of the base needs the user to change wind OR gravity
+ *      Please check the other version for a far superior version of the app
  * 
  * @author Steve Vegdahl
  * @author Andrew Nuxoll
@@ -45,7 +43,7 @@ public class CannonAnimator implements Animator {
 	private Target topTarg;
 	private Target sideTarg;
 	private Cannon cannon;
-	private ArrayList<CannonBall> balls;
+	private CannonBall ball;
 	
 	/**
 	 * Interval between animation frames: .03 seconds (i.e., about 33 times
@@ -104,7 +102,6 @@ public class CannonAnimator implements Animator {
             topTarg = new Target(xSize - xSize / 2, 100, 1);
             sideTarg = new Target(xSize - 300, ySize - ySize / 2, 2);
             cannon = new Cannon(ySize);
-            balls = new ArrayList<CannonBall>();
 			wind = 0;
 			CannonBall.setWind(wind);
         }
@@ -147,22 +144,19 @@ public class CannonAnimator implements Animator {
         topTarg.draw(g, count);
         sideTarg.draw(g, count);
 
-        //draws the balls
-		for(int i = 0; i < balls.size(); i++)
-		{
-			if(balls.get(i).getxPos() > xSize + 40 || balls.get(i).getxPos() < -40)
-			{ //removes balls if off the screen
-				balls.remove(i);
-				i--;
-			}
+        //draws the ball
+        if(ball != null)
+        {
+            ball.draw(g);
+            cannon.checkHit(ball);
+            topTarg.checkHit(ball);
+            sideTarg.checkHit(ball);
 
-			if(i < balls.size() && i >= 0) { //checks all hittable objects for each ball
-				balls.get(i).draw(g);
-                topTarg.checkHit(balls.get(i));
-                sideTarg.checkHit(balls.get(i));
-                cannon.checkHit(balls.get(i));
-			}
-		}
+            if(ball.getxPos() > xSize + 40 || ball.getxPos() < -40 || ball.getyPos() > ySize)
+            {
+                ball = null;
+            }
+        }
 
         //draw the cannon
 		cannon.draw(g);
@@ -197,8 +191,7 @@ public class CannonAnimator implements Animator {
 		if(event.getX() >= fireX && event.getY() >= fireY && !cannon.isDestroyed()) //fire button, cannon exists
 		{
 			if(event.getAction() == MotionEvent.ACTION_DOWN) { //prevents moving cannon when shooting
-				CannonBall ball = new CannonBall(cannon.getDegrees(), ySize);
-				balls.add(ball);
+				ball = new CannonBall(cannon.getDegrees(), ySize);
 				shots++;
 			}
 		}

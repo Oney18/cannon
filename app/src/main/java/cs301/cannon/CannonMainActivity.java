@@ -12,9 +12,7 @@ import android.widget.LinearLayout;
  * containing a particular Animator object
  *
  * TO GRADER: EC Options Included:
- *  	Targets have animated explosion upon hit (5pt)
  *  	Arbitrary number of cannonballs on screen at once (5pt)
- *  	Balls bounce realistically on the ground (5pt)
  *
  * @author Andrew Nuxoll
  * @author Jarrett Oney

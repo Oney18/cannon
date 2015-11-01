@@ -20,7 +20,6 @@ public class CannonBall {
     private double yVel; //y velocity of ball
     private double xPos; //x pos of ball
     private double yPos; //y pos of ball
-    private int bottomOfScreen; //height of the canvas
     private Paint blackPaint; //paint used to create the ball
     private int life; //amount of ticks the ball has been alive
 
@@ -49,8 +48,6 @@ public class CannonBall {
 
         //Ball begins its life
         life = 0;
-
-        bottomOfScreen = yBottom;
     }
 
     /**
