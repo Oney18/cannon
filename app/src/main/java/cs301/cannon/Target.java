@@ -5,59 +5,78 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 /**
- * Created by oney18 on 10/31/2015.
- * 2100
- * 1400
+ * Target
+ *
+ * This is the class for the various target animations
+ * It holds the methods required to paint them as well as their logic
+ *
+ * @author Jarrett Oney
+ * @version October 2015
+ *
  */
 public class Target {
 
     private Paint redPaint;
     private Paint whitePaint; //paints used for the targets
-    private Paint blackPaint;
+    private Paint expPaint;
 
-    private int initX; //starting x pos
-    private int initY; //starting y pos
-    private int xCent; //x pos of target
-    private int yCent; //y pos of target
+    private double initX; //starting x pos
+    private double initY; //starting y pos
+    private float xCent; //x pos of target
+    private float yCent; //y pos of target
     private int type; //the kind/phase of the target
     private int hitCount; //count when hit
-    private int velX; //speed of movement in X
-    private int velY; //speed of movement in Y
+    private double velX; //speed of movement in X
+    private double velY; //speed of movement in Y
 
-    private boolean hit;
+    private boolean hit; //was the target hit?
 
-    public Target(int initX, int initY, int type)
+    /**
+     * Creates a new target object
+     *
+     * @param initX Initial x position of target
+     * @param initY Initial y position of target
+     * @param type The type of target being made
+     */
+    public Target(double initX, double initY, int type)
     {
+        //inits the paints used for the target
         redPaint = new Paint();
         redPaint.setColor(Color.RED);
         whitePaint = new Paint();
         whitePaint.setColor(Color.WHITE);
-        blackPaint = new Paint();
-        blackPaint.setColor(Color.BLACK);
-        blackPaint.setAlpha(150);
+        expPaint = new Paint();
+        expPaint.setARGB(0, 119, 55, 55);
 
 
         this.initX = initX;
         this.initY = initY;
-
         this.type = type;
-        hit = false;
+
+        hit = false; //is not hit initially
     }
 
+    /**
+     * Calculates the target's velocity and draws the target
+     *
+     * @param g Canvas target is drawn on
+     * @param count The current time in ticks the animation has been running
+     */
     public void draw(Canvas g, double count) {
-        if (type < 3) {
+
+        if (type < 3) { //no need to check velocity for a destroyed target
             double targVelX = Math.cos(count / 32);
             double targVelY = Math.sin(count / 32);
 
-            velX = (int) (500 * targVelX);
-            velY = (int) (350 * targVelY);
+            velX = 500 * targVelX;
+            velY = 350 * targVelY;
         }
 
         switch (type) {
 
             case 1: //target goes to left and right
-                xCent = initX + velX;
-                yCent = initY;
+                xCent = (float) (initX + velX);
+                yCent = (float) initY;
                 g.drawCircle(xCent, yCent, 70, redPaint);
                 g.drawCircle(xCent, yCent, 50, whitePaint);
                 g.drawCircle(xCent, yCent, 30, redPaint);
@@ -65,8 +84,8 @@ public class Target {
                 break;
 
             case 2: //target goes up and down
-                xCent = initX;
-                yCent = initY + velY;
+                xCent = (float) initX;
+                yCent = (float) (initY + velY);
                 g.drawCircle(xCent, yCent, 70, redPaint);
                 g.drawCircle(xCent, yCent, 50, whitePaint);
                 g.drawCircle(xCent, yCent, 30, redPaint);
@@ -78,8 +97,8 @@ public class Target {
                 g.drawCircle(xCent, yCent + 2*hitCount, 50, whitePaint);
                 g.drawCircle(xCent, yCent + 2*hitCount, 30, redPaint);
                 g.drawCircle(xCent, yCent + 2*hitCount, 10, whitePaint);
-                g.drawCircle(xCent, yCent + 2*hitCount, hitCount, blackPaint);
-                blackPaint.setAlpha((int)(2.5*hitCount)); //gets darker
+                g.drawCircle(xCent, yCent + 2*hitCount, hitCount, expPaint);
+                expPaint.setAlpha((int)(2.5*hitCount)); //gets darker
                 hitCount++;
 
                 if (hitCount >= 101) { //begins second phase of explosion
@@ -89,8 +108,8 @@ public class Target {
                 break;
 
             case 4: //explosion leaving
-                g.drawCircle(xCent, yCent + 2*(101 - hitCount), hitCount, blackPaint);
-                blackPaint.setAlpha((int)(2.5*hitCount)); //gets lighter
+                g.drawCircle(xCent, yCent + 2*(101 - hitCount), hitCount, expPaint);
+                expPaint.setAlpha((int)(2.5*hitCount)); //gets lighter
                 hitCount--;
                 if(hitCount <= 1) //explosion concluded
                 {
@@ -108,12 +127,18 @@ public class Target {
         return hit;
     }
 
+    /**
+     * Checks to see if a target is hit based on a ball's position
+     *
+     * @param ball The ball that might hit the target
+     */
     public void checkHit(CannonBall ball)
     {
+        //There is a 50x50 pixel square around the center of the target that denotes the hit zone
         if( type < 3 && ball.getxPos() - xCent <= 50 && ball.getxPos() - xCent >= -50 &&
                 ball.getyPos() - yCent <= 50 && ball.getyPos() - yCent >= -50)
         {
-          type = 3;
+            type = 3; //begins the explosion
             hit = true;
         }
     }

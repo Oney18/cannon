@@ -10,15 +10,21 @@ import android.widget.LinearLayout;
  * 
  * This is the activity for the cannon animation. It creates a AnimationCanvas
  * containing a particular Animator object
- * 
+ *
+ * TO GRADER: EC Options Included:
+ *  	Targets have animated explosion upon hit (5pt)
+ *  	Arbitrary number of cannonballs on screen at once (5pt)
+ *  	Balls bounce realistically on the ground (5pt)
+ *
  * @author Andrew Nuxoll
- * @version September 2012
+ * @author Jarrett Oney
+ * @version October 2015
  * 
  */
 public class CannonMainActivity extends Activity {
 
 	/**
-	 * creates an AnimationCanvas containing a TestAnimator.
+	 * creates an AnimationCanvas containing a CannonAnimator.
 	 */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -26,8 +32,8 @@ public class CannonMainActivity extends Activity {
 		setContentView(R.layout.activity_cannon_main);
 
 		// Create an animation canvas and place it in the main layout
-		Animator testAnim = new TestAnimator();
-		AnimationCanvas myCanvas = new AnimationCanvas(this, testAnim);
+		Animator canAnim = new CannonAnimator();
+		AnimationCanvas myCanvas = new AnimationCanvas(this, canAnim);
 		LinearLayout mainLayout = (LinearLayout) this.findViewById(R.id.topLevelLayout);
 		mainLayout.addView(myCanvas);
 
